@@ -1,1 +1,1 @@
-from .midi import MIDIStream
+from .midi import AbsoluteStream, RelativeStream
