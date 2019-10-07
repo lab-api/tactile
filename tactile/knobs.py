@@ -7,6 +7,7 @@ class Knob:
     parameter = attr.ib()
     display_events = attr.ib(default=False, converter=bool)
     output = attr.ib(default=None)
+    locked = attr.ib(default=False, converter=bool)
 
     def display(self, message):
         if self.display_events:
@@ -14,6 +15,9 @@ class Knob:
                 self.output = Text()
                 display(self.output)
             self.output.value = str(message)
+
+    def toggle_lock(self):
+        self.locked = not self.locked
 
 @attr.s
 class AbsoluteKnob(Knob):
@@ -23,6 +27,8 @@ class AbsoluteKnob(Knob):
     mode = 'absolute'
 
     def handle(self, value):
+        if self.locked:
+            return
         x = self.parameter
         target = x.bounds[0] + (x.bounds[1]-x.bounds[0])*value/127
         x(target)
@@ -35,7 +41,6 @@ class RelativeKnob(Knob):
         the lock state of the channel, which will force incoming directional events to be ignored.
     '''
     resolution = attr.ib(default=1024, converter=float)
-    locked = attr.ib(default=False, converter=bool)
     mode='relative'
 
     def handle(self, direction):
@@ -47,6 +52,3 @@ class RelativeKnob(Knob):
         x(target)
 
         self.display(x)
-
-    def toggle_lock(self):
-        self.locked = not self.locked
