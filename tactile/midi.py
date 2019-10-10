@@ -88,5 +88,5 @@ class RelativeStream(MIDIStream):
 
     def handle(self, event):
         if event.channel in self.knobs:
-            direction = {self.plus_value: 1, self.minus_value: 0}[event.value]
+            direction = {self.plus_value: 1, self.minus_value: -1}[event.value]
             self.knobs[event.channel].handle(direction)
