@@ -43,10 +43,19 @@ class MIDIStream:
     buffer_size = attr.ib(default=1024, converter=int)
     display_events = attr.ib(default=False, converter=bool)
     knobs = attr.ib(factory=dict)
+    bind_parameter = attr.ib(default=None)
+
+    @abstractmethod
+    def assign(self, channel, parameter):
+        pass
 
     @abstractmethod
     def handle(self, ch, val):
         pass
+
+    def bind(self, parameter):
+        ''' Listens for the next channel event and binds the parameter to that channel. '''
+        self.bind_parameter = parameter
 
     def start(self):
         if self.display_events:
@@ -69,6 +78,9 @@ class MIDIStream:
                 inst = MIDIEvent(event)
                 if self.display_events:
                     self.output.value = str(inst)
+                if self.bind_parameter is not None:
+                    self.assign(inst.channel, self.bind_parameter)
+                    self.bind_parameter = None
                 self.handle(inst)
             time.sleep(self.delay)
 
