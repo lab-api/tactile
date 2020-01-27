@@ -9,6 +9,15 @@ import attr
 from abc import abstractmethod
 from tactile.knobs import RelativeKnob, AbsoluteKnob
 
+def list_input_devices():
+    devices = []
+    for i in range(255):
+        info = midi.get_device_info(i)
+        if info is None:
+            continue
+        if info[2] == 1:    # check that device is an output device
+            print(info[1].decode())  # print device name
+
 def find_device_id(device_name):
     for i in range(255):
         info = midi.get_device_info(i)

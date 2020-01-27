@@ -1,1 +1,1 @@
-from .midi import AbsoluteStream, RelativeStream
+from .midi import AbsoluteStream, RelativeStream, list_input_devices
