@@ -18,11 +18,14 @@ def list_input_devices():
         if info[2] == 1:    # check that device is an output device
             print(info[1].decode())  # print device name
 
-def find_device_id(device_name):
+def open_stream(name):
+    ''' Searches for a MIDI input device matching the passed name and opens
+        a stream. If name=None, opens the first input device.
+    '''
     for i in range(255):
         info = midi.get_device_info(i)
-        if info[1].decode() == device_name and info[2] == 1:
-            return i
+        if (name is None or info[1].decode() == name) and info[2] == 1:
+            return midi.Input(i)
 
 class MIDIEvent:
     def __init__(self, event):
@@ -38,7 +41,7 @@ class MIDIStream:
     ''' Opens a MIDI stream with the specified device. The passed device_name should match one of the entries given by
         pygame.midi.get_device_info(i) while iterating through integers i.
     '''
-    device_name = attr.ib(converter=str)
+    device_name = attr.ib(default=None)
     delay = attr.ib(default=0, converter=float)
     buffer_size = attr.ib(default=1024, converter=int)
     display_events = attr.ib(default=False, converter=bool)
@@ -62,8 +65,7 @@ class MIDIStream:
             self.output = Text()
             display(self.output)
 
-        devid = find_device_id(self.device_name)
-        self.stream = midi.Input(devid)
+        self.stream = open_stream(self.device_name)
         Thread(target=self.run).start()
         return self
 
